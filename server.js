@@ -2,7 +2,8 @@
 
 // Load array of notes
 const data = require('./db/notes');
-
+const simDB = require('./db/simDB');  // <<== add this
+const notes = simDB.initialize(data);
 console.log('Hello Noteful!');
 
 // INSERT EXPRESS APP CODE HERE...
@@ -20,24 +21,37 @@ const logger = require('./middleware/logger');
 app.use(express.static('public'));
 app.use(logger);
 
-app.get('/api/notes', (req, res) => {
-  const searchTerm = req.query.searchTerm;
+// app.get('/api/notes', (req, res) => {
+//   const searchTerm = req.query.searchTerm;
 
-  if (searchTerm) {
-    return res.json(data.filter(note => note.title.includes(searchTerm)));
-  }
+//   if (searchTerm) {
+//     return res.json(data.filter(note => note.title.includes(searchTerm)));
+//   }
   
-  res.json(data);
+//   res.json(data);
+// });
+
+app.get('/api/notes', (req, res, next) => {
+  const { searchTerm } = req.query;
+
+  notes.filter(searchTerm, (err, list) => {
+    if (err) {
+      return next(err); // goes to error handler
+    }
+    res.json(list); // responds with filtered array
+  });
 });
 
-app.get('/api/notes/:id', (req, res) => {
+app.get('/api/notes/:id', (req, res, next) => {
   const id = req.params.id;
-  const note = data.find(note => note.id === Number(id));
-  res.json(note);
-});
-
-app.get('/boom', (req, res, next) => {
-  throw new Error('Boom!!');
+  
+  notes.find(id, (err, note) => {
+    if (err) {
+      return next(err);
+    }
+    res.json(note);
+  });
+  
 });
 
 app.use(function (req, res, next) {
