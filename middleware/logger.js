@@ -1,10 +1,9 @@
 'use strict';
 
-function requestLogger(req, res, next) {
+const simpleLogger = function (req, res, next) {
   const now = new Date();
-  console.log(
-    `${now.toLocaleDateString()} ${now.toLocaleTimeString()} ${req.method} ${req.url}`);
+  console.log(`${now.toLocaleString()} ${req.method} ${req.url}`);
   next();
-}
+};
 
-module.exports = requestLogger;
+module.exports = simpleLogger;
