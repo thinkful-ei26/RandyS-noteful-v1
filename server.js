@@ -1,20 +1,23 @@
 'use strict';
 
 const express = require('express');
+const morgan = require('morgan');
 
 // Simple In-Memory Database
-const data = require('./db/notes');
-const simDB = require('./db/simDB');
-const notes = simDB.initialize(data);
+// const data = require('./db/notes');
+// const simDB = require('./db/simDB');
+// const notes = simDB.initialize(data);
 
-const logger = require('./middleware/logger');
+// const logger = require('./middleware/logger');
 const { PORT } = require('./config');
 
 // Create an Express application
 const app = express();
 
+// Create router 
+const notesRouter = require('./router/notes.router');
 // Log all requests
-app.use(logger);
+// app.use(logger);
 
 // Create a static webserver
 app.use(express.static('public'));
@@ -22,66 +25,12 @@ app.use(express.static('public'));
 // Parse request body
 app.use(express.json());
 
-// Get All (and search by query)
-app.get('/api/notes', (req, res, next) => {
-  const { searchTerm } = req.query;
+//log all requests with morgan
+app.use(morgan('dev'));
 
-  notes.filter(searchTerm, (err, list) => {
-    if (err) {
-      return next(err);
-    }
-    res.json(list);
-  });
-});
+// send all requests to Notes router
+app.use('/api', notesRouter);
 
-// Get a single item
-app.get('/api/notes/:id', (req, res, next) => {
-  const id = req.params.id;
-
-  notes.find(id, (err, item) => {
-    if (err) {
-      return next(err);
-    }
-    if (item) {
-      res.json(item);
-    } else {
-      next();
-    }
-  });
-});
-
-// Put update an item
-app.put('/api/notes/:id', (req, res, next) => {
-  const id = req.params.id;
-
-  /***** Never trust users - validate input *****/
-  const updateObj = {};
-  const updateableFields = ['title', 'content'];
-
-  updateableFields.forEach(field => {
-    if (field in req.body) {
-      updateObj[field] = req.body[field];
-    }
-  });
-
-  /***** Never trust users - validate input *****/
-  if (!updateObj.title) {
-    const err = new Error('Missing `title` in request body');
-    err.status = 400;
-    return next(err);
-  }
-
-  notes.update(id, updateObj, (err, item) => {
-    if (err) {
-      return next(err);
-    }
-    if (item) {
-      res.json(item);
-    } else {
-      next();
-    }
-  });
-});
 
 
 // Catch-all 404
