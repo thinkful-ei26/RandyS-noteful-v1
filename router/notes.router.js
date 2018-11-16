@@ -17,16 +17,8 @@ router.get('/', (req, res, next) => {
   const { searchTerm } = req.query;
 
   notes.filter(searchTerm)
-    .then(item => {
-      if (item) {
-        res.json(item);
-      } else {
-        next();
-      }
-    })
-    .catch(err => {
-      next(err);
-    });
+    .then(item => res.json(item)) 
+    .catch(err => next(err));
 });
 
 // Get a single item
@@ -94,7 +86,7 @@ router.post('/', (req, res, next) => {
   notes.create(newItem)
     .then(item => {
       if (item) {
-        res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+        res.location(`http://${req.headers.host}/api/notes/${item.id}`).status(201).json(item);
       } else {
         next();
       }
