@@ -29,7 +29,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // send all requests to Notes router
-app.use('/api', notesRouter);
+app.use('/api/notes', notesRouter);
 
 
 
