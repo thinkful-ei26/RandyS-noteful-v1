@@ -69,4 +69,4 @@ INSERT INTO notes (title, content) VALUES
 
 -- DELETE FROM notes WHERE id = 1;
 
-SELECT * FROM notes;
+-- SELECT title FROM notes;
