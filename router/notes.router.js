@@ -30,12 +30,12 @@ router.get('/:id', (req, res, next) => {
       if (item) {
         res.json(item);
       } else {
-        next();
+        const err = new Error("That id doesn't exist")
+        err.status = 404;
+        return next(err);
       }
     })
-    .catch(err => {
-      next(err);
-    });
+    .catch(err => next(err));
 });
 
 // Put update an item
@@ -60,16 +60,8 @@ router.put('/:id', (req, res, next) => {
   }
 
   notes.update(id, updateObj)
-    .then(item => {
-      if (item) {
-        res.json(item);
-      } else {
-        next();
-      }
-    })
-    .catch(err => {
-      next(err);
-    });
+    .then(item => res.json(item))
+    .catch(err => next(err));
 });
 
 router.post('/', (req, res, next) => {
@@ -84,16 +76,8 @@ router.post('/', (req, res, next) => {
   }
 
   notes.create(newItem)
-    .then(item => {
-      if (item) {
-        res.location(`http://${req.headers.host}/api/notes/${item.id}`).status(201).json(item);
-      } else {
-        next();
-      }
-    })
-    .catch(err => {
-      next(err);
-    });
+    .then(item => res.location(`http://${req.headers.host}/api/notes/${item.id}`).status(201).json(item))
+    .catch(err => next(err));
 });
 
 router.delete('/:id', (req, res, next) => {

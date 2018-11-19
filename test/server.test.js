@@ -61,9 +61,9 @@ describe('Notes as an array', function () {
       .get('/api/notes/?searchTerm=trash')
       .then(function(res){
         console.log('RESSSS', res.body);
-        expect(res.body).to.be.a('array');
-        expect(res.body.length).to.equal(0);
-        // expect(res.body).to.equal([]);
+        expect(res.body).to.be.a('array').that.is.empty;
+        // expect(res.body).to.be.empty();
+        // expect(res.body.length).to.equal(0);
         //why doesnt this work ^^
       });
   });
@@ -147,7 +147,6 @@ describe('Update a note', function() {
           expect(res.body).to.deep.equal(updateData);
         })
     );
-  
   });
 
   it('should respond with a 404 for an invalid id', function() {
